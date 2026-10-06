@@ -4,7 +4,18 @@ One neutral production toolchain that takes a layered **PSD** to a game-ready **
 
 > One server. Multiple brains. The model reasons; the MCP does deterministic production work.
 
-Status: **planning / scaffolding.** The production engine already exists and is tested in [CLAUDE-SPINE](https://github.com/kumikilongyeyo/CLAUDE-SPINE) (Spine 4.2 meshes, heat weights, IK, physics, turn rigs, slot juice, ~28 FX recipes, AE bridge, budget QA). This repo is the model-neutral shell and orchestration layer around it. See [docs/ROADMAP.md](docs/ROADMAP.md).
+Status: **v0.2.0, roadmap steps 1-3 done.** The full tested engine (Spine 4.2 meshes, heat weights, IK, physics, turn rigs, slot juice, ~28 FX recipes, AE bridge, budget QA; 49 tools, 1169 tests) now lives here as the `art_pipeline` package, ported from [CLAUDE-SPINE](https://github.com/kumikilongyeyo/CLAUDE-SPINE) with no algorithm changes. `claude_spine` and the `claude-spine` command remain as aliases. Orchestration (`pipeline.*`), manifests and HTTP transport are next, see [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Quick start
+
+```bash
+uvx --from git+https://github.com/kumikilongyeyo/ART-PIPELINE-MCP art-pipeline
+```
+
+- **Codex:** [docs/CODEX.md](docs/CODEX.md)
+- **Claude Code:** `claude mcp add -s user art-pipeline -- uvx --from git+https://github.com/kumikilongyeyo/ART-PIPELINE-MCP art-pipeline`
+
+Engine reference: [docs/RIGS.md](docs/RIGS.md), [docs/FX_RECIPES.md](docs/FX_RECIPES.md).
 
 ## Why not `GPT-SPINE`?
 

@@ -2,9 +2,9 @@
 
 Order matters: each step keeps the previous one working.
 
-1. **Neutralise the repo.** Move the engine into `art_pipeline/` (compat shim keeps `claude_spine` and the `claude-spine` command). Rename the FastMCP server to `art-pipeline`. Strip Claude-specific wording from docs and install steps.
+1. **Neutralise the repo.** ✅ done in 0.2.0. Move the engine into `art_pipeline/` (compat shim keeps `art_pipeline` and the `art-pipeline` command). Rename the FastMCP server to `art-pipeline`. Strip Claude-specific wording from docs and install steps.
 2. **Keep every Spine algorithm untouched.** Heat weighting, meshes, 2.5D turn, character rigs, slot recipes, AE sequences, atlas generation and runtime QA are tested and verified frame-for-frame against the Spine CLI. No rewrites.
-3. **Codex entry point.** Document `~/.codex/config.toml` MCP setup and add a one-command install. Codex speaks local MCP, so this is the first target.
+3. **Codex entry point.** ✅ docs/CODEX.md. Document `~/.codex/config.toml` MCP setup and add a one-command install. Codex speaks local MCP, so this is the first target.
 4. **Streamable HTTP transport.** Keep stdio, add HTTP so the Responses API can call it remotely, and private machines can connect through Secure MCP Tunnel.
 5. **Orchestrator tools.** `pipeline.*` tools that inspect, plan, execute, validate and retry: `prepare_symbol`, `rig_character`, `animate_symbol`, `make_win_animation`, `add_fx`, `optimize_mobile`, `export_game_ready`.
 6. **Asset manifest.** JSON schema plus validation; tools take the manifest instead of free-form layer/bone names.
