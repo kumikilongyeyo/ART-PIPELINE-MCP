@@ -1,0 +1,18 @@
+{
+  "asset": "bomb_candy",
+  "type": "slot_symbol",
+  "target": "mobile",
+  "source": "bomb.psd",
+  "layers": {
+    "body": "BOMB_BODY",
+    "liquid_core": "LIQUID_CORE",
+    "splash_left": "SPLASH_LEFT",
+    "droplets": "DROPLETS_FRONT"
+  },
+  "animations": ["idle", "land", "anticipation", "win", "win_loop"],
+  "fx": {
+    "native": ["sparkle", "squash_stretch"],
+    "ae": ["flash", "bloom"]
+  },
+  "budget": "mobile_symbol"
+}
