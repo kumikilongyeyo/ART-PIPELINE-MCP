@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0",
+  "gameId": "example-slot",
+  "concept": {
+    "referenceWidth": 1080,
+    "referenceHeight": 1920,
+    "preferredOrientation": "portrait",
+    "backgroundPolicy": "cover",
+    "gameplayPolicy": "contain-safe"
+  },
+  "layout": {
+    "reels": { "x": 120, "y": 520, "width": 840, "height": 720 },
+    "winZone": { "anchor": "bottom-center", "safeMargin": 32 },
+    "controlsZone": { "anchor": "bottom", "safeAreaAware": true },
+    "featureZones": []
+  },
+  "layers": [
+    "background",
+    "environment-back",
+    "rear-vfx",
+    "reel-frame",
+    "symbols",
+    "front-vfx",
+    "foreground-art",
+    "gameplay-hud",
+    "reward-overlay",
+    "modal-debug"
+  ],
+  "math": {
+    "mode": "adapter",
+    "productionAuthority": "server",
+    "mathVersion": "TBD",
+    "rtpProfileId": "TBD",
+    "currencyStorage": "integer-credits",
+    "paytableSource": "math-config"
+  },
+  "presentation": {
+    "grammar": ["cause", "recognition", "focus", "reward", "read", "release"],
+    "timingProfile": "normal",
+    "turboProfile": "turbo",
+    "reducedMotionProfile": "reduced-motion",
+    "symbolTapShowsPayout": true,
+    "bonusTransitionRequired": true
+  },
+  "qa": {
+    "forceMode": true,
+    "recordedRoundReplay": true,
+    "debugOverlay": true,
+    "productionForceMode": false
+  },
+  "performance": {
+    "mobileFirst": true,
+    "preloadFeatureAssetsBeforeTransition": true,
+    "measureFrameTime": true,
+    "measureTextureBudget": true
+  }
+}
