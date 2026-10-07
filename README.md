@@ -90,12 +90,14 @@ The model edits a manifest; the tools consume predictable structured data, so bo
 
 ## FRONTEND Slots Agent
 
-This repo also includes a Claude Code specialist for art-first web/mobile slot implementation:
+This repo includes a Claude Code specialist rebuilt from the actual **Slot Engines Source Pack**:
 
 - Agent: [.claude/agents/frontend-slots-agent.md](.claude/agents/frontend-slots-agent.md)
-- Playbooks: [docs/agents/frontend-slots-agent/](docs/agents/frontend-slots-agent/README.md)
+- Agent docs: [docs/agents/frontend-slots-agent/](docs/agents/frontend-slots-agent/README.md)
+- Source-engine selection map: [SOURCE_ENGINE_MAP.md](docs/agents/frontend-slots-agent/SOURCE_ENGINE_MAP.md)
+- Source-pack audit: [AUDIT.md](docs/agents/frontend-slots-agent/AUDIT.md)
 
-It standardizes concept-preserving layout, symbol payout inspection, win/bonus choreography, eye-leading, math/RTP boundaries, deterministic replay, QA and mobile performance without forcing different slot themes into the same visual style.
+The agent combines the Showcase engine's clean result-provider/QA boundary with the Jeepney 4x3+1 engine's stronger timing, skip/slam, wheel, Spine and VFX presentation patterns. It also standardizes reel-symbol payout inspection, reward eye-leading, bonus transitions, RTP/math version boundaries, deterministic replay and mobile recovery.
 
 ## License
 
