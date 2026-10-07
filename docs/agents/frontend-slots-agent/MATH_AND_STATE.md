@@ -1,189 +1,338 @@
 # FRONTEND Slots Agent — Math, RTP and State Playbook
 
-Use this playbook when wiring game results, RTP profiles, paytables, round state, settlement, replay or reconnect behavior.
+Use this playbook for result-provider integration, RTP-profile wiring, game state, settlement boundaries, retries, replay and recovery.
+
+The supplied engines expose an important contrast:
+- Showcase has the cleaner result-provider seam.
+- Jeepney has a strong controller but couples its demo engine/session more tightly.
+
+For future titles, preserve Showcase's provider idea and apply it consistently across both families.
 
 ## Hard boundary
 
-    math / RNG / settlement
-              |
-              v
-      normalized round result
-              |
-              v
-          game state
-              |
-              v
-         presentation
+    production math/server OR demo math engine
+                    |
+                    v
+              Round Provider
+                    |
+                    v
+          Normalized Round Result
+                    |
+                    v
+           Session / Game State
+                    |
+                    v
+          Presentation Director
 
 Presentation never determines outcomes.
 
-For regulated/real-money production, the server or approved math service should normally be authoritative for RNG, outcome and settlement. A local math implementation is acceptable for a prototype/demo only when clearly isolated behind the same contract.
+For production or real-money systems, default to authoritative server/service RNG, balance and settlement. Local SlotEngine/Session behavior is a demo/prototype implementation unless explicitly approved otherwise.
 
-## Normalized round result
+## Unified provider contract
 
-Use a versioned contract. A typical result carries:
+The frontend should depend on an interface conceptually like:
+
+    requestRound(request) -> normalized result
+
+The provider may be:
+- ServerResultProvider,
+- MockResultProvider,
+- ScenarioResultProvider,
+- RecordedResultProvider.
+
+Game presentation should not care which provider produced the result.
+
+## Request identity
+
+Every production request should carry enough identity for tracing and idempotency, for example:
+- requestId,
+- gameId/version,
+- bet in integer credits/minor units,
+- mode/base/free-spin context,
+- selected approved feature-buy option,
+- active math/RTP profile identifier when protocol requires it,
+- previous round/session token where required.
+
+Do not let UI components construct ad hoc math payloads.
+
+## Normalized result contract
+
+Use a versioned response.
+
+Recommended common fields:
 - schemaVersion,
+- requestId,
 - roundId,
 - mathVersion,
 - rtpProfileId,
+- configChecksum or equivalent,
 - betCredits,
-- totalWinCredits,
-- reels,
+- initialGrid/reels,
+- ordered presentation steps,
 - wins,
-- optional feature results,
-- optional next state.
+- totalWinCredits,
+- special-symbol outcomes,
+- multiplier/collector data,
+- feature trigger/feature payload,
+- next free-spin/feature state,
+- authoritative settled balance where production architecture exposes it.
 
-Extend it for the mechanic, but keep visual concerns out.
+Mechanic-specific payloads may extend this contract.
 
-Do not put CSS classes, animation names, particle presets or screen coordinates inside the math result.
+Do not put:
+- CSS classes,
+- screen coordinates,
+- animation clip names,
+- particle names
 
-The presentation layer maps semantic results to visuals.
+inside the math result. Map semantic math facts to presentation in the frontend.
 
-## Money/value precision
+## Runtime validation
 
-Prefer integer credits or integer minor currency units.
+The Showcase server-provider template is intentionally minimal. Production integration should add runtime response validation.
 
-Do not use binary floating-point arithmetic for settled money.
+Validate before presenting:
+- supported schemaVersion,
+- expected request/round identity,
+- known symbol IDs,
+- grid dimensions/topology,
+- numeric bounds,
+- recognized feature payload,
+- result step ordering/shape,
+- required settlement fields,
+- internally sane totals where frontend can safely check.
 
-Formatting is presentation:
-- currency symbol,
-- thousands separators,
-- decimal places,
-- locale.
+Development should fail loudly. Production should enter a controlled recovery/error path rather than presenting corrupt data.
 
-Settlement is math/data.
+## Abort, timeout and retries
 
-## Paytable single source
+Network behavior is part of round correctness.
 
-The payout inspector, info screen and result validation should read from the same approved paytable source.
+Use:
+- AbortController or equivalent cancellation,
+- explicit timeout,
+- request-state UI,
+- controlled retry policy,
+- idempotency.
 
-Do not maintain one paytable in math and another manually typed in UI.
+Never blindly replay a spin POST after an unknown network outcome unless the backend protocol guarantees the same requestId returns the same authoritative round.
 
-If the active bet changes how values are displayed, compute display values from the authoritative paytable/bet model.
+On timeout after submission, prefer:
+- status/recovery query by requestId/roundId,
+- authoritative session sync,
+- then resume/fast-forward presentation.
 
-## RTP profiles
+## RTP profile discipline
 
-Treat RTP as an approved, versioned math profile.
+RTP is a RED-zone concern.
+
+Treat an RTP profile as an approved versioned math artifact, not a visual setting.
 
 Recommended identity:
 
-    game math version + RTP profile ID + config checksum
+    mathVersion + rtpProfileId + configChecksum
 
-Frontend responsibilities:
-- receive/select an approved profile when architecture requires,
-- display/report its identifier in dev/debug tools,
-- never mutate probability tables ad hoc,
-- never claim an RTP is validated without math simulation/approval.
+Frontend can:
+- request/receive an allowed profile,
+- display its identity in dev/debug tools,
+- route the active paytable/function data to UI,
+- present outcomes.
 
-Changing a reel weight or bonus probability is not just frontend configuration.
+Frontend must not:
+- tweak weights to "make the game feel better",
+- change feature trigger probability from VFX logic,
+- change RNG based on turbo/skip/device speed,
+- claim an RTP is validated without the required simulation/approval.
+
+Any changes to reel strips, paytable, feature odds, multiplier distribution or feature-buy return require math tests/simulation.
+
+## Certification wording
+
+The source pack contains mock/tuned math paths and simulation-oriented values. Treat them as development references.
+
+Do not label a configuration "certified" unless it has actually completed the relevant certification/approval process.
+
+## Paytable single source
+
+The global info screen and reel symbol inspector must use the same active math/paytable source.
+
+Never maintain:
+- one paytable in math,
+- a second manually typed paytable in the tooltip.
+
+If payout display depends on bet, ways or mode, derive it from the same authoritative configuration used for the active round rules.
+
+## Money/value precision
+
+Prefer:
+- integer credits,
+- or integer minor currency units.
+
+Avoid binary floating-point settlement arithmetic.
+
+Formatting belongs to presentation:
+- separators,
+- currency symbol,
+- locale,
+- decimal display.
+
+Authoritative value belongs to settlement/math.
 
 ## State machine
 
-Prefer explicit states over boolean soup.
+The supplied engines have broad phases. Production-minded flow should make network and transition states explicit enough to reason about.
 
-Example:
+A useful high-level model:
 
     BOOT
     LOADING
     READY
+    REQUESTING_RESULT
     SPINNING
     STOPPING
-    EVALUATING
-    PRESENTING_WIN
-    FEATURE_TRANSITION
+    PRESENTING
+    FEATURE_TRANSITION_IN
     FEATURE_ACTIVE
-    FEATURE_OUTRO
+    FEATURE_TRANSITION_OUT
     ROUND_COMPLETE
     RECOVERING
     ERROR
 
-Only permit transitions that make sense.
+A hierarchical state machine is fine. Avoid boolean soup.
 
-## Round identity and idempotency
+The state should answer:
+- may the player spin?
+- may they slam?
+- may they skip?
+- may they inspect a symbol?
+- is a round request in flight?
+- is settlement authoritative?
+- is a feature transition active?
 
-Every async callback/event that can outlive a state should carry or close over the active round ID.
+## Round and sequence identity
 
-Long presentation sequences should also use a sequence ID or equivalent.
+Every round gets a roundId.
 
-Before applying a delayed effect/state update:
-- confirm the round is still active,
-- confirm the expected state,
-- confirm the sequence has not been cancelled.
+Every long presentation sequence should also have a sequenceId/cancellation identity.
 
-The same settlement message received twice must not credit twice.
+Any callback that can fire later must verify:
+- correct active round,
+- correct active sequence,
+- expected state,
+- token not cancelled.
 
-## Presentation queue
+This is especially important around:
+- big-win counters,
+- feature intros,
+- reel stop timers,
+- delayed VFX,
+- wheel settle callbacks.
 
-Use an explicit queue/timeline rather than unrelated timeouts.
+## Idempotency
 
-Each step should know:
-- what event it represents,
-- whether it is skippable,
-- cleanup behavior,
-- final-state application,
-- cancellation token/sequence ID.
+Receiving or replaying the same authoritative result twice must not:
+- deduct bet twice,
+- credit win twice,
+- consume free spin twice,
+- increment feature state twice.
 
-This prevents stale animations from writing into the next round.
+Separate permanent/session state changes from replayable visual presentation.
 
-## Recorded replay
+## Full-result fixture vs presentation replay
 
-Make normalized results serializable.
+Keep these concepts distinct.
 
-A QA/development screen should be able to:
-1. paste/load a recorded result,
-2. reset presentation state,
-3. replay it deterministically,
-4. switch timing profile,
-5. inspect logs.
+### Full-result fixture
+Uses a rule-valid normalized result.
+Use it to test:
+- game logic,
+- grid/final result,
+- feature state,
+- balance reconciliation,
+- real presentation path.
 
-This is one of the highest-value tools for art/VFX review.
+### Presentation-only replay
+Replays an animation/VFX state without pretending a new payable round occurred.
+Use it for:
+- art review,
+- wheel motion,
+- anticipation,
+- wild/scatter animation,
+- big-win treatment,
+- banner/payline timing.
+
+Never let a presentation-only replay touch settlement.
+
+## Recorded result replay
+
+Normalized results should be serializable.
+
+QA should be able to:
+1. load a saved result JSON,
+2. reset visual state,
+3. replay presentation,
+4. select normal/turbo/reduced-motion,
+5. compare expected final board/state.
+
+This is critical for reproducible bugs.
+
+## Refresh and reconnect
+
+For an authoritative production round:
+- refresh must not create another award,
+- reconnect should recover the current/last authoritative round,
+- final balance/state comes from the authority,
+- unfinished presentation can resume or fast-forward,
+- permanent settlement must not be replayed.
+
+Use stable checkpoints such as:
+- result acquired,
+- settlement known,
+- base presentation complete,
+- feature entered,
+- feature complete.
+
+## Hidden/suspended browser
+
+Mobile browsers can pause timers.
+
+On visibility resume:
+1. re-check state,
+2. discard/rebase stale timers,
+3. verify active round/sequence,
+4. fast-forward to a stable checkpoint when necessary,
+5. resume audio according to browser policy,
+6. never rerun settlement.
 
 ## Force mode
 
-Force mode can request scenarios such as:
-- specific reels,
+Development force controls should request a real fixture/result contract where possible.
+
+Useful scenarios:
+- loss,
+- small/medium/large win,
 - wild,
 - scatter,
-- bonus,
-- multiplier,
+- anticipation fail/success,
+- feature trigger,
 - collector,
-- big win,
-- jackpot test state,
-- cascade,
-- losing round.
+- multiplier,
+- wheel result,
+- EX NUDGE,
+- jackpot test,
+- free spins.
 
-Prefer forcing through the same result contract used by real rounds so the actual production presentation path is exercised.
+Release builds must not expose forced math/scenario providers accidentally.
 
-Production builds must not accidentally expose force controls. Gate them at build/runtime configuration and verify the gate in release QA.
+## Math-change gate
 
-## Refresh/reconnect
+Before merging a RED change:
+- identify exact changed math inputs,
+- run unit/rule tests,
+- run required simulation,
+- record target and observed RTP/volatility metrics,
+- compare confidence/statistical error as appropriate,
+- update mathVersion/profile/checksum,
+- rerun critical forced scenarios.
 
-For production settlement:
-- frontend refresh must not create a new award for the same round,
-- the app should query/recover authoritative round state,
-- unresolved presentation may resume or fast-forward,
-- final settled values must be restored deterministically.
-
-Persist only what the architecture allows. Never trust client-only state as the sole source of financial truth.
-
-## Hidden tab / suspended app
-
-Mobile browsers may pause timers and audio.
-
-On visibility resume:
-- re-read current state,
-- discard stale timers,
-- re-sync timeline or fast-forward to a stable checkpoint,
-- resume audio only when allowed by platform policy,
-- never re-run settlement.
-
-## Contract validation
-
-Validate incoming results before presentation:
-- schema version supported,
-- known symbol IDs,
-- non-negative values where expected,
-- feature payload matches feature type,
-- total values internally consistent enough for frontend sanity checks.
-
-On invalid data, fail visibly in development and recover safely in production according to project policy.
+Presentation-only changes should not require RTP re-simulation unless they crossed into RED behavior.
