@@ -1,119 +1,270 @@
-# FRONTEND Slots Agent — Plan Audit
+# FRONTEND Slots Agent — Source-Pack Audit
 
-This records the gaps found in the earlier monolithic plan and the smarter architecture used by the consolidated agent.
+This audit was rebuilt from the actual Slot Engines Source Pack.
 
-## 1. Too much always-on prompt
+The earlier ArtPrompter-based pass is superseded. ArtPrompter assumptions are not part of this agent.
 
-The earlier plan contained many good rules but loaded all of them at once.
+## 1. The two engines should be fused, not ranked
 
-Risk: important instructions become harder to prioritize and every task carries unnecessary context.
+### Showcase strength
+The Showcase project has the cleaner math/presentation seam:
+- IResultProvider-style abstraction,
+- mock/server/scenario providers,
+- normalized spin results,
+- scenario forcing,
+- QA that can compare presented board/final state.
 
-Fix: keep a compact core agent and move specialist detail into on-demand playbooks for presentation, math/state, art/layout and QA/performance.
+### Jeepney strength
+The Jeepney project has the stronger presentation discipline:
+- controller explicitly owns HOW/WHEN results are shown,
+- normal/turbo timing profiles,
+- skip token/clock,
+- wheel and EX NUDGE sequencing,
+- presentation-only debug replays,
+- strong Spine/VFX integration.
 
-## 2. UI kit scope was too broad
+### Smarter solution
+Use Showcase's provider/result architecture and Jeepney's timing/presentation architecture as the common target.
 
-The ArtPrompter kit is explicitly a Chrome-extension side-panel design system.
+## 2. Jeepney needs a production provider seam
 
-Risk: applying its macOS/glass styling to the actual slot would fight the approved slot art.
+Jeepney directly creates its local SlotEngine and its Session handles demo balance/settlement.
 
-Fix: external UI kits are scoped specifications. ArtPrompter may govern tooling/editor/debug/utility surfaces, not immersive reels unless explicitly requested.
+That is fine for a demo but too coupled for production integration.
 
-## 3. RTP modification needed a safer boundary
+### Solution
+Put Jeepney behind the same RoundProvider concept:
+- server provider for production,
+- local/mock provider for demo,
+- scenario/recorded provider for QA.
 
-The earlier plan separated math and visuals but still left room for casual configuration edits.
+Keep GameController focused on presentation.
 
-Risk: frontend changes accidentally alter odds or claim an unvalidated RTP.
+## 3. Symbol tap/click payout is missing in both engines
 
-Fix: versioned math profiles, explicit mathVersion plus rtpProfileId, single approved paytable source, simulation/approval outside presentation, and server-authoritative production math by default.
+Neither supplied SymbolView implementation provides the requested per-reel-symbol payout inspector.
 
-## 4. No hard protection against stale async work
+### Solution
+Add a board-level SymbolInspectorController:
+- stopped/settled reels only,
+- click/tap a symbol,
+- derive payout/function from active paytable/config,
+- safe tooltip placement,
+- dismiss on gameplay start/transition,
+- optional matching-symbol soft highlight.
 
-Slot presentation is full of delayed animation callbacks.
+Never duplicate payout values in tooltip code.
 
-Risk: a late callback from the previous round modifies the next one.
+## 4. Bonus transitions exist but are not generalized
 
-Fix: every round has a round ID; longer sequences have sequence identity/cancellation. State and identity are checked before delayed mutations.
+The pack has useful feature intros and mode changes, but no single reusable transition contract.
 
-## 5. No deterministic replay workflow
+### Solution
+Create explicit feature transition states:
 
-Force buttons alone are useful but still weak for art review.
+    TRIGGER_RECOGNITION
+    FEATURE_CONFIRMATION
+    FEATURE_TRANSITION_IN
+    FEATURE_READY
+    FEATURE_COMPLETE
+    FEATURE_TRANSITION_OUT
 
-Fix: normalized round results are serializable and replayable. A recorded result can reproduce the exact presentation at normal/turbo/reduced-motion timing.
+Preload required feature assets before entry.
 
-## 6. Refresh/reconnect was underspecified
+## 5. Eye-leading needed an executable grammar
 
-Mobile browsers suspend, reload and reconnect frequently.
+"Make it immersive" is too vague for an agent.
 
-Fix: separate authoritative settlement from presentation, restore settled state on reconnect, and never allow replay/recovery to duplicate credit.
-
-## 7. Presentation rules were descriptive, not executable enough
-
-"Lead the eye" is correct but can remain subjective.
-
-Fix: use the reusable grammar:
+### Solution
+Use:
 
     CAUSE -> RECOGNITION -> FOCUS -> REWARD -> READ -> RELEASE
 
-and an attention budget of primary / secondary / ambient.
+And an attention budget:
+- primary,
+- secondary,
+- ambient.
 
-## 8. Timing values risk becoming scattered magic numbers
+This makes prize presentation reviewable instead of subjective hand-waving.
 
-Fix: semantic timing tokens and centralized timing profiles for normal/turbo/reduced-motion.
+## 6. Showcase timing is too dependent on magic waits
 
-## 9. Layout preservation needed a technical mechanism
+Showcase has several literal presentation waits while Jeepney centralizes timing profiles more effectively.
 
-"Follow concept art" is not enough.
+### Solution
+Move presentation durations into semantic config/timing profiles:
+- normal,
+- turbo1,
+- turbo2 where supported,
+- reducedMotion.
 
-Fix: establish a logical design-space coordinate system, explicit anchor/safe-area manifest and a named visual-layer contract.
+Use cancellable timelines/tokens rather than unrelated timers.
 
-## 10. Payout inspection needed single-source data
+## 7. Jeepney's cosmetic randomness hurts exact replay
 
-If the clickable symbol tooltip has its own values, it will drift from math.
+Some Jeepney presentation/VFX paths use Math.random.
 
-Fix: symbol inspector reads the active paytable/feature config directly.
+This does not decide payouts, but it makes exact screenshots/video replay non-deterministic.
 
-## 11. Currency precision/localization was missing
+### Solution
+Introduce seeded VisualRng:
+- seed from round/sequence/event identity,
+- use only for visual randomness,
+- keep completely separate from outcome RNG.
 
-Fix: settlement uses integer credits/minor units where possible; formatting is localized at the presentation layer.
+## 8. ServerResultProvider needs production hardening
 
-## 12. Hidden-tab/mobile lifecycle was missing
+The Showcase server provider is a useful seam but is intentionally minimal.
 
-Fix: on resume, discard stale timers, re-sync state/timeline, respect platform audio policy and never replay settlement.
+Missing production concerns include:
+- runtime schema validation,
+- schemaVersion,
+- requestId/roundId discipline,
+- mathVersion/rtpProfileId,
+- timeout/abort,
+- idempotent retry/recovery,
+- reconnect and session sync.
 
-## 13. Force/debug tooling could leak into production
+### Solution
+Harden the provider contract without leaking network logic into presentation.
 
-Fix: explicit release gate: force mode/debug surfaces must be impossible to enable accidentally in production.
+Never blindly retry an unknown-outcome spin request unless the backend supports idempotency.
 
-## 14. Bonus transitions lacked recovery semantics
+## 9. State models are too coarse for recovery
 
-Fix: bonus entry and exit are explicit states with preloaded assets, stable checkpoints and skip/recovery convergence.
+Existing phases are enough for demos but not enough to reason cleanly about request-in-flight, feature transitions and recovery.
 
-## 15. Visual hierarchy could become more effects = more premium
+### Solution
+Use explicit/high-level states such as:
 
-Fix: define attention budget and VFX tiers. Stillness and suppression are legitimate premium tools.
+    BOOT
+    LOADING
+    READY
+    REQUESTING_RESULT
+    SPINNING
+    STOPPING
+    PRESENTING
+    FEATURE_TRANSITION_IN
+    FEATURE_ACTIVE
+    FEATURE_TRANSITION_OUT
+    ROUND_COMPLETE
+    RECOVERING
+    ERROR
 
-## 16. No distinction between mechanic correctness and presentation correctness
+Use roundId and sequenceId to reject stale callbacks.
 
-Fix: definition of done requires both final-state correctness and player comprehension.
+## 10. QA is split across two good ideas
 
-## Final architecture
+Showcase has stronger valid full-round scenarios.
 
-    Approved Concept + Asset Manifest
-                  |
-                  v
-            Layout Contract
-                  |
-    Math Adapter -> Normalized Round Result
-                  |
-                  v
-             State Machine
-                  |
-                  v
-        Presentation Controller
-           /      |       \
-        Reels     UI   Spine/VFX/Audio
-                  |
-                  v
-          QA Replay + Telemetry
+Jeepney has stronger cheap presentation-only replays.
 
-The architecture is theme-agnostic. Different reskins can share the same behavioral backbone without becoming visually identical.
+### Solution
+Keep both:
+1. rule-valid full-result fixtures,
+2. presentation-only replay,
+3. recorded normalized-result replay,
+4. visual regression,
+5. deterministic VisualRng.
+
+Do not confuse a presentation replay with a payable round.
+
+## 11. RTP modification must stay a RED-zone workflow
+
+The user needs a clean RTP modification space, but that cannot become casual frontend tuning.
+
+### Solution
+Track:
+
+    mathVersion + rtpProfileId + configChecksum
+
+Any reel weight, paytable, feature probability, multiplier distribution or return-affecting buy-price change requires math validation/simulation.
+
+Presentation receives approved math results. It does not manipulate return.
+
+## 12. Mobile lifecycle needs stronger recovery
+
+The engines account for responsive presentation and some audio visibility behavior, but full presentation recovery is not generalized.
+
+### Solution
+Handle:
+- visibility suspend/resume,
+- pagehide/pageshow,
+- orientation change,
+- dynamic mobile viewport,
+- reconnect,
+- refresh after settled result.
+
+On resume, revalidate round/state and resume or fast-forward presentation without double settlement.
+
+## 13. Engine selection should happen before coding
+
+The source pack already contains multiple useful topologies.
+
+### Solution
+Select the closest family first:
+- Showcase cascade: Super Ace/Piñata/Bonanza/Olympus-like,
+- Showcase reelmult: 3x3 collector and 3x3+1 multiplier,
+- Jeepney: 4x3+1 wheel/EX NUDGE.
+
+Create a new engine only if config/contained extension cannot express the title.
+
+## 14. Source pack master should stay protected
+
+A reskin should not silently become an engine rewrite.
+
+### Solution
+Create a title copy/branch/project first, preserve stable asset IDs, and classify changes GREEN/YELLOW/RED before edits.
+
+## 15. The previous agent restricted its Claude tools
+
+The earlier agent frontmatter declared only common file/shell tools.
+
+That can prevent a subagent from seeing connected MCP tools such as ART-PIPELINE-MCP.
+
+### Solution
+The rebuilt agent omits a restricted tools list and inherits available session tools.
+
+## 16. Art production and game presentation need a clear boundary
+
+ART-PIPELINE-MCP can produce/validate PSD, Spine and VFX assets.
+
+The frontend agent decides:
+- where assets appear,
+- which gameplay event calls them,
+- timing,
+- focus hierarchy,
+- performance budget.
+
+Neither asset tooling nor presentation should become the math authority.
+
+## Final target architecture
+
+    Approved concept + title manifest
+                 |
+                 v
+          Layout / asset contract
+                 |
+                 v
+    authoritative server OR demo math
+                 |
+                 v
+            Round Provider
+                 |
+                 v
+        Normalized Round Result
+                 |
+                 v
+          Session / Game State
+                 |
+                 v
+        Presentation Director
+        /       |        \
+     Reels    Focus     Bonus/Reward
+       |        |         |
+     Spine     UI      VFX / Audio
+                 |
+                 v
+       Fixtures / Replay / QA
+
+The target is not one visual template. It is one reliable behavioral and technical backbone that can carry many different slot art directions.
