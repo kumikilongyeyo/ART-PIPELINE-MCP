@@ -88,6 +88,15 @@ The model edits a manifest; the tools consume predictable structured data, so bo
 - **stdio** (local): Codex, Claude Code.
 - **Streamable HTTP** (planned): OpenAI Responses API remote MCP, and private servers via Secure MCP Tunnel.
 
+## FRONTEND Slots Agent
+
+This repo also includes a Claude Code specialist for art-first web/mobile slot implementation:
+
+- Agent: [.claude/agents/frontend-slots-agent.md](.claude/agents/frontend-slots-agent.md)
+- Playbooks: [docs/agents/frontend-slots-agent/](docs/agents/frontend-slots-agent/README.md)
+
+It standardizes concept-preserving layout, symbol payout inspection, win/bonus choreography, eye-leading, math/RTP boundaries, deterministic replay, QA and mobile performance without forcing different slot themes into the same visual style.
+
 ## License
 
 MIT. Spine engine derived from [egorfedorov/spine-mcp](https://github.com/egorfedorov/spine-mcp) via CLAUDE-SPINE; see LICENSE.
