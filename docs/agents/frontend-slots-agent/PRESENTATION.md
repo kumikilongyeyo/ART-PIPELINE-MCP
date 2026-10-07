@@ -1,233 +1,340 @@
 # FRONTEND Slots Agent — Presentation Playbook
 
-Use this playbook for win choreography, bonus transitions, VFX, audio, anticipation, timing, attention direction and reward readability.
+Use this playbook for win choreography, bonus transitions, anticipation, reel timing, VFX, audio, skip/slam behavior and player eye direction.
 
-## Core grammar
+The supplied source pack gives two useful references:
+- Showcase proves the result should already be decided before GameFlow presents it.
+- Jeepney is the stronger reference for HOW and WHEN that decided result is revealed.
 
-Every important event should normally follow:
+## Core presentation grammar
+
+For important events use:
 
     CAUSE -> RECOGNITION -> FOCUS -> REWARD -> READ -> RELEASE
 
-The purpose is comprehension first, impact second.
+This is the default grammar, not a rigid animation template.
 
-If every layer flashes simultaneously, the player sees noise rather than causality.
+### Cause
+Show or preserve enough context for the player to understand what generated the event.
+
+### Recognition
+Make the relevant symbol, payline, collector, multiplier, trigger or wheel state identifiable.
+
+### Focus
+Reduce competition and deliberately direct attention.
+
+### Reward
+Present the value or feature.
+
+### Read
+Give the player enough time to understand the result.
+
+### Release
+Clear temporary emphasis and return attention/control to the next gameplay state.
 
 ## Attention budget
 
-At a given moment classify visible activity as:
+Classify visible activity as:
+- Primary — one thing the player must notice now.
+- Secondary — context that explains the primary event.
+- Ambient — atmosphere only.
 
-- Primary — one focal event the player must notice.
-- Secondary — supporting information that explains the primary event.
-- Ambient — atmosphere that must never compete with the first two.
+Normally allow one primary focus at a time.
 
-Normally allow one primary focal event. If two pieces of information are both essential, sequence them instead of making them fight.
-
-Use four levers to direct attention:
+Use four main attention tools:
 1. motion,
 2. contrast/brightness,
 3. scale/position,
-4. sound.
+4. audio.
 
-More VFX is not automatically more premium. Often the best way to make a prize readable is to quiet everything else.
+Premium presentation is not maximum effects. Suppression and stillness are often stronger.
 
-## Win choreography
+## Prize-value eye leading
 
-Small win:
-- establish winning symbol/way,
-- small response,
-- update/read value,
+When a prize or total appears, do not just spawn text.
+
+Recommended sequence:
+1. identify winning source,
+2. quiet unrelated symbol/VFX motion,
+3. keep or create a visual path from source to reward,
+4. bring the value into primary focus,
+5. count/resolve it,
+6. hold the final number,
+7. use proportional celebration,
+8. return focus to reels or next event.
+
+Useful techniques:
+- winning symbols remain bright while unrelated reels lower contrast,
+- collected coins travel toward the collector/value,
+- multiplier energy travels toward the total,
+- camera/light direction supports the reward location,
+- lower-priority audio ducks under the reward cue.
+
+Do not hide the value inside particles.
+
+## Win tiers
+
+### Small
+Fast:
+- identify win,
+- brief response,
+- value update,
 - release.
 
-Medium win:
-- stronger symbol response,
-- clearer value entry/count,
-- short supporting VFX/audio,
-- readable hold,
-- release.
+### Medium
+- clearer symbol response,
+- short value animation,
+- supporting VFX/audio,
+- readable hold.
 
-Large win:
-- reduce competing ambient motion,
-- visually connect winning source to value,
-- use stronger sound hierarchy,
-- allow longer hold.
+### Large
+- reduce competing activity,
+- connect cause to total,
+- stronger sound hierarchy,
+- longer clean hold.
 
-Big/Mega/Epic:
-- use a dedicated presentation layer only when the threshold warrants it,
+### Big / Mega / Epic
+Use a dedicated reward layer only when the threshold warrants it.
 - value is dominant,
-- counter cadence escalates,
-- tier change is obvious,
-- background/reel activity is suppressed,
-- final amount gets a clean stop and hold.
+- counter can escalate through tiers,
+- reels/background become subordinate,
+- final value gets a clean stop,
+- exit returns smoothly to game state.
 
-Jackpot:
-- highest priority,
-- normal UI/ambient FX must not compete with the jackpot value and reason for award.
-
-Do not celebrate tiny outcomes with jackpot-scale treatment. Without contrast, spectacle becomes wallpaper.
+### Jackpot
+Highest presentation priority. Do not let normal reel/UI animation compete.
 
 ## Winning-source explanation
 
-Whenever a result is presented, visually explain what caused it:
-- winning payline,
-- winning ways,
-- cluster,
-- collected values,
-- special symbol,
-- multiplier source.
+The player should be able to answer: "Why did I win that?"
 
-If multiple wins exist, group or sequence them intelligently. Do not make the player wait through dozens of slow, redundant line animations.
+Highlight the actual source:
+- payline,
+- ways,
+- tumble/cluster,
+- wild substitution,
+- collect event,
+- multiplier,
+- feature award.
 
-## Value transfer
+For many simultaneous wins, group them when individual cycling adds no useful clarity. Do not trap the player in a slow parade of redundant lines.
 
-When a value changes because of another object, show cause and destination.
+## Global symbol payout/function inspector
 
-Examples:
-- coin value -> collector,
-- multiplier -> total win,
-- bonus prize -> feature total,
-- jackpot token -> jackpot meter.
+The supplied source engines do not currently provide per-symbol reel inspection. Add it as a standard layer.
 
-Movement should explain the data change, not exist as decoration.
+Default rules:
+- active only on stopped/settled reels,
+- desktop click or mobile tap selects a symbol,
+- normal symbol shows payouts applicable to the current mechanic,
+- special symbol explains function/trigger conditions,
+- values come from the active paytable/config,
+- no duplicate hard-coded paytable copy,
+- tooltip/card avoids screen edges and finger occlusion,
+- tap another symbol to replace,
+- outside tap closes,
+- spin/feature transition closes immediately.
 
-## Symbol payout inspector
+Prefer a board-level SymbolInspectorController instead of attaching bespoke popup logic to every SymbolView.
 
-Global default:
-- click/tap a symbol to inspect its payout or function,
-- data comes from the live paytable/config,
-- selected symbol owns focus,
-- unrelated symbols may quiet slightly,
-- popup uses safe placement around reel edges,
-- mobile placement avoids the finger/gesture area,
-- inspector disappears when gameplay resumes.
-
-Special symbols describe behavior rather than fabricating a normal line payout.
+If the same symbol appears elsewhere, optional soft matching highlights may be used, but keep the selected symbol primary.
 
 ## Anticipation
 
-Anticipation should be conditional and informative.
+Anticipation must be justified by the already-decided result or an allowed known trigger state. It must never change the result.
 
-Good anticipation tells the player why they should care:
-- two scatters landed and a third is possible,
-- a collector is one source away from triggering,
-- a wheel/jackpot state is genuinely pending.
+Good anticipation:
+- two scatters have landed and later reels may resolve the feature,
+- a known collector/feature condition is pending,
+- a wheel or bonus state is genuinely being entered.
 
-Avoid fake or constant anticipation that trains the player to ignore it.
-
-The sequence is generally:
-1. establish the near-trigger,
-2. slow/quiet competing motion,
+Sequence:
+1. establish why attention should shift,
+2. slow/quiet irrelevant activity,
 3. intensify the relevant reel/zone,
 4. resolve,
-5. immediately communicate success or failure.
+5. clearly communicate success/failure,
+6. release.
 
-## Bonus entry
+Avoid constant fake anticipation. If it fires all the time, it becomes wallpaper.
 
-A bonus transition is a state change, not a scene cut.
+## Bonus / free-spin entry
 
-Recommended phases:
-1. Recognition — triggering symbols/object become primary.
-2. Confirmation — show the feature/award.
-3. Anticipation — short authored pause.
-4. Transformation — world/reels/HUD change.
-5. Feature HUD — counters/meters become readable.
-6. Ready — only now return control.
+The source pack has useful feature intros but no single reusable transition director. Standardize one.
 
-Possible transformation devices:
+Recommended states:
+
+    TRIGGER_RECOGNITION
+    FEATURE_CONFIRMATION
+    FEATURE_TRANSITION_IN
+    FEATURE_READY
+
+Presentation sequence:
+1. trigger lands,
+2. trigger symbols/object own focus,
+3. nonessential activity quiets,
+4. feature name/award is confirmed,
+5. short anticipation beat,
+6. environment/reels/HUD transform,
+7. feature counters/meters enter,
+8. feature HUD becomes readable,
+9. feature becomes READY,
+10. return input according to the mechanic.
+
+Transformation can use:
 - camera push,
-- reel frame transformation,
-- environment color/light change,
+- frame transformation,
+- background/light shift,
 - character reaction,
-- portal/wipe,
-- themed object expansion,
-- foreground transition.
+- themed wipe/portal,
+- foreground transition,
+- reel material/state change.
 
-Keep the visual language related to the base game.
+Keep the same product identity. Bonus mode should feel elevated, not like a different game accidentally opened.
 
-## Bonus exit
+Preload critical feature assets before transition.
+
+## Feature exit
+
+Use a mirrored authored sequence:
+
+    FEATURE_COMPLETE
+    FINAL_FEATURE_REWARD
+    FEATURE_TRANSITION_OUT
+    BASE_RESTORE
+    ROUND_CONFIRM
 
 Recommended:
-1. stop feature loop cleanly,
-2. resolve final feature value,
+1. stop feature loops,
+2. resolve final feature amount,
 3. hold it,
-4. consolidate into total,
-5. transition back,
-6. restore base HUD/reels,
-7. confirm final total,
-8. return input.
+4. consolidate to total,
+5. transition world/HUD,
+6. restore base reels and music,
+7. confirm total/final state,
+8. return control.
 
-Never let bonus audio/VFX leak indefinitely into the base state.
+Kill or fade feature-only audio/VFX cleanly.
 
-## Timing system
+## Wheel presentation
 
-Do not scatter magic millisecond values across components.
+For Jeepney-style wheel mechanics:
+- the mathematical landing result must already be known,
+- visual spin is a presentation of that result,
+- start with readable acceleration,
+- use controlled deceleration,
+- final pointer/segment must settle unambiguously,
+- hold final value before applying downstream reward presentation.
 
-Define semantic timing tokens in one place:
-- instant,
-- micro,
-- fast,
+Do not use visual randomness to choose the outcome.
+
+If cosmetic wobble/jitter exists, use seeded VisualRng for deterministic replay.
+
+## EX NUDGE / collector presentation
+
+Make the relationship obvious:
+1. identify contributing values/symbols,
+2. animate or route them toward the collector,
+3. show collector response,
+4. update the destination value,
+5. hold final state.
+
+Do not make values disappear on one side and magically change a number elsewhere.
+
+## Cascade/tumble rhythm
+
+Typical loop:
+
+    WIN -> HIGHLIGHT -> AWARD -> REMOVE -> DROP/REFILL -> EVALUATE -> NEXT
+
+Do not begin the next cascade before the previous cause/result can be understood.
+
+Multipliers that persist/escalate should receive a visible update beat before the next evaluation.
+
+## Presentation timing
+
+The Jeepney engine's config-driven normal/turbo profiles are the preferred direction. The Showcase hard-coded waits should be refactored when touching those paths.
+
+Do not scatter raw waits throughout controllers.
+
+Central timing profiles should support at least:
 - normal,
-- emphasis,
-- feature,
-- cinematic.
+- turbo1,
+- turbo2 when applicable,
+- reducedMotion.
 
-Reasonable starting ranges, not laws:
-- micro: about 80–160 ms,
-- fast: about 160–280 ms,
-- normal: about 250–450 ms,
-- emphasis: about 400–750 ms,
-- feature hold: about 650–1200 ms.
+Use semantic values such as:
+- reelStartStagger,
+- reelStopGap,
+- anticipationHold,
+- winHighlight,
+- rewardCount,
+- rewardHold,
+- featureIntro,
+- featureExit,
+- bigWinTierHold.
 
-Tune by readability and game feel.
-
-Preferred rhythm:
+Timing should feel:
 
     anticipation -> impact -> readable hold -> release
 
 Avoid evenly spaced robotic beats.
 
-## Turbo
+## Slam and skip semantics
 
-Turbo compresses presentation, not math.
+Borrow Jeepney's strong input idea and make it consistent.
 
-Turbo may:
-- shorten reel travel,
-- reduce low-value holds,
-- simplify low-priority FX,
-- accelerate counters.
+When reels move:
+- primary action may slam/fast-stop if mechanic permits.
 
-Turbo must preserve:
-- trigger recognition,
-- settlement correctness,
-- important values,
-- final state.
+When skippable presentation is playing:
+- primary action requests skip.
 
-Use one timing profile multiplier/system rather than manually editing dozens of animations.
+Skip must:
+- cancel current cancellable timeline,
+- clean up temporary VFX/audio,
+- apply final display state exactly once,
+- keep settlement untouched,
+- continue from the correct next presentation step.
 
-## Skip
+Do not treat skip as "set speed to 1000 and hope callbacks finish."
 
-Skip must converge to the same final presentation state:
-- cancel active timelines safely,
-- stop/duck associated audio,
-- clear transient FX,
-- apply final UI values once,
-- mark sequence complete,
-- continue queue.
+## Cancellation
 
-Skip cannot duplicate awards or bypass settlement.
+Long sequences need a sequence/cancellation token.
 
-## VFX tiers
+Before any delayed callback mutates visible state, verify:
+- active round ID,
+- active sequence ID,
+- expected game state,
+- token not cancelled.
 
-Use a consistent escalation ladder:
-- Tier 0 idle,
-- Tier 1 micro response,
-- Tier 2 small win,
-- Tier 3 medium win,
-- Tier 4 feature/large win,
-- Tier 5 jackpot/major event.
+This prevents a previous win animation from corrupting the next round.
 
-Reserve Tier 5.
+## Cosmetic randomness
 
-Modular VFX layers are preferred:
+The Jeepney source uses Math.random in some visual-only paths. Replace those paths when exact replay matters.
+
+Use a separate seeded VisualRng:
+- derived from roundId + sequence/event key,
+- used for particles, small shake offsets, harmless decorative filler,
+- never used for outcome generation.
+
+Outcome RNG and visual RNG must remain separate.
+
+## VFX escalation
+
+Use tiers:
+- Tier 0: idle ambience,
+- Tier 1: micro response,
+- Tier 2: small win,
+- Tier 3: medium win,
+- Tier 4: large win / feature,
+- Tier 5: jackpot / major event.
+
+Reserve the top tier.
+
+Prefer modular effects:
 - impact,
 - trail,
 - glow,
@@ -235,34 +342,56 @@ Modular VFX layers are preferred:
 - particles,
 - aura,
 - distortion,
-- screen treatment,
-- environmental reaction.
+- environment reaction,
+- screen treatment.
 
-This makes style changes cheap.
+This makes stylized/realistic/premium-soft looks easy to swap without rewriting event logic.
 
-## Sound hierarchy
+## Audio hierarchy
 
-Organize buses/layers such as:
+Keep useful groups such as:
 - music,
 - ambience,
 - reels,
 - symbols,
 - UI,
-- wins,
-- features,
+- win,
+- feature,
 - voice.
 
-Major reward audio may duck lower-priority layers.
+Audio should reinforce the same focal point as the visuals.
 
-Sound should reinforce the same focal point the visuals are directing toward.
+Major reward/feature cues may duck lower-priority layers.
 
 ## Reduced motion
 
-Reduced-motion mode must preserve comprehension while removing unnecessary:
-- camera moves,
-- shakes,
-- large parallax,
-- long particle travel,
-- repeated loops.
+Reduced-motion presentation must remain understandable.
 
-Replace motion with contrast, scale snap, static highlight and shorter transitions rather than deleting result communication.
+Reduce:
+- camera travel,
+- heavy shake,
+- long particle travel,
+- parallax,
+- repeated decorative loops.
+
+Replace them with:
+- static contrast,
+- short scale response,
+- clear highlight,
+- simpler fades,
+- shorter authored holds.
+
+Do not remove the cause/result communication.
+
+## Commercial benchmark use
+
+PG Soft, FA CHAI, OMNIPLAY and GameZone are interaction-quality references, not templates to clone.
+
+Extract:
+- predictable controls,
+- readable reward values,
+- consistent feature language,
+- mobile-first hierarchy,
+- clear event staging.
+
+Do not reproduce their exact artwork, proprietary animation sequences, screen layouts or branded trade dress.
