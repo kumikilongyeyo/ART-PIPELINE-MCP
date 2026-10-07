@@ -1,168 +1,251 @@
 # FRONTEND Slots Agent — Art, Layout and Responsive Playbook
 
-Use this playbook when porting approved concept art, arranging reels/HUD, integrating assets or adapting to devices.
+Use this playbook when porting approved concept art, reskinning a supplied engine, integrating Spine/assets or adapting a title to mobile/desktop.
 
-## Art-first implementation
+## First rule: choose the engine before rebuilding layout
 
-The approved concept is the composition authority.
+Consult SOURCE_ENGINE_MAP.md.
 
-Do not begin with a generic slot shell and squeeze the art into it.
+If the approved concept maps to an existing Showcase or Jeepney topology, use that engine and its layout/config system first.
 
-Start by measuring:
-- reference canvas,
-- reel bounding box,
-- logo/character anchors,
-- control zone,
-- win-message zone,
-- special feature zones,
+Do not recreate reels/HUD from scratch just because the final art direction is different.
+
+## Approved concept is authority
+
+The runtime should feel like the approved concept became interactive.
+
+Before implementation measure:
+- logical reference canvas,
+- reel box and row/column topology,
+- special reel/wheel position,
+- logo,
+- character,
+- jackpot/header zones,
+- win/prize zone,
+- feature counters/meters,
+- bottom controls,
+- foreground overlaps,
 - safe crop background,
-- foreground overlaps.
+- key negative space.
 
-Create a layout manifest or equivalent data structure instead of scattering positions across components.
+Lock those relationships into a layout/config manifest.
 
 ## Design-space coordinates
 
-Use a stable logical design space based on the approved concept, normally its source dimensions.
+Jeepney's fixed logical design-space approach is a strong base.
 
-Map that design space to the viewport with a predictable transform.
+Use a stable logical canvas based on the approved concept, often 1080x1920 for portrait titles when that matches the source art.
 
-Typical policy:
-- gameplay plane: fit/contain within safe region,
-- background: cover and crop,
-- decorative bleed: allowed outside safe region,
-- critical UI: anchored to gameplay/safe area,
+Map to viewport predictably:
+- gameplay plane: contain/fit inside safe area,
+- background: cover/crop,
+- decorative bleed: may crop,
+- critical UI: stays inside safe area,
 - touch controls: respect device insets.
 
-This preserves art relationships better than arbitrary breakpoint nudging.
+Do not solve responsiveness with dozens of random pixel breakpoints.
+
+## Showcase config path
+
+For Showcase-family titles, keep reskin/config changes concentrated in the existing configuration surfaces such as:
+- skin_config,
+- engine_config,
+- feature_config,
+- stable asset IDs and imported layout data.
+
+Preserve the existing provider/gameflow boundary.
+
+If PSD/import tooling already captures placement/font/blend information, use that data rather than eyeballing all positions again.
+
+## Jeepney theme path
+
+For Jeepney-family titles, use the theme/layout configuration and logical coordinate system as the first customization surface.
+
+Preserve:
+- reel/wheel topology,
+- declared layout anchors,
+- decorative z/layer intent,
+- semantic Spine states,
+- timing config separation.
+
+Do not hardcode a theme reskin deep into GameController if theme/config can express it.
 
 ## Layer contract
 
-Define named visual layers, for example:
+Use named layers instead of random z-index escalation.
+
+Typical ordering:
 1. background,
 2. environment back,
-3. rear VFX,
-4. reel frame/backplate,
-5. reel symbols,
-6. symbol/front VFX,
-7. character/foreground art,
+3. rear atmospheric VFX,
+4. reel/wheel backplates,
+5. symbols/reels,
+6. symbol/win VFX,
+7. foreground/character art,
 8. gameplay HUD,
-9. transient reward layer,
-10. modal/info/debug.
+9. reward/feature overlay,
+10. modal/help/debug.
 
-Do not solve z-order bugs with random escalating z-index values.
+A title can add layers, but their responsibilities should remain clear.
+
+## Stable asset IDs
+
+Keep gameplay references stable while art changes.
+
+Example principle:
+- code asks for HIGH_01 or SCATTER semantic asset,
+- theme/skin config points that ID to the title artwork.
+
+Do not rename gameplay IDs every time an artist changes a filename.
+
+## Spine states
+
+Prefer semantic states:
+- idle,
+- land,
+- win,
+- anticipation,
+- trigger,
+- loop,
+- exit.
+
+Map those semantic states to actual Spine animation names in config/adapter code.
+
+This allows the animation asset to evolve without rewriting gameplay controllers.
+
+## ART-PIPELINE-MCP
+
+When connected, ART-PIPELINE-MCP can handle:
+- PSD inspection/preparation,
+- crop/export,
+- Spine rig/mesh/weights,
+- animation,
+- procedural VFX,
+- AE-assisted effects where justified,
+- runtime/mobile budget QA.
+
+The FRONTEND Slots Agent remains responsible for where and when those assets are used in gameplay.
+
+Asset tooling never becomes the math authority.
 
 ## Reel readability
 
-At gameplay scale:
-- symbol silhouettes must remain distinct,
-- important text/numbers must survive mobile size,
-- frame ornament cannot eat symbol area,
-- glow cannot destroy edges,
-- high/low symbols should separate clearly.
+Test symbols at actual mobile play size.
 
-Test at the actual target viewport, not just browser zoom on desktop.
+Require:
+- distinct silhouettes,
+- strong high/low separation,
+- readable special-symbol text/value,
+- no frame ornament stealing the symbol area,
+- controlled glow that preserves edges,
+- no tiny detail that vanishes at game scale.
+
+A hi-res source image is not automatically a readable reel symbol.
+
+## Symbol interaction hit areas
+
+The new payout inspector requires reliable hit testing.
+
+Rules:
+- stop/idle state only by default,
+- hit area can be larger than visible symbol art,
+- do not overlap neighboring symbol hit zones,
+- mobile tap target should be forgiving,
+- do not hijack host-page scrolling outside the actual game canvas,
+- popup placement accounts for finger occlusion.
 
 ## Safe areas and mobile browser behavior
 
-Account for:
-- safe-area insets,
-- iOS dynamic viewport behavior,
-- address bar changes,
-- orientation change,
-- landscape notches/cutouts,
-- virtual keyboard if any text input exists.
+Handle:
+- safe-area insets/notches,
+- dynamic viewport height,
+- browser bars,
+- orientation changes,
+- landscape cutouts,
+- page resize during resume,
+- virtual keyboard if any text field exists.
 
-Do not anchor critical controls to a hard-coded physical screen edge without safe-area compensation.
+Critical spin/bet/win/feature information must not live under device chrome.
 
-## Touch
+## Portrait and landscape
 
-Visible icon size and touch hitbox may differ.
+Showcase already demonstrates portrait/landscape support; preserve that idea.
 
-Prefer touch targets around 44 by 44 CSS pixels where practical, especially for utility controls.
+Responsive behavior may change:
+- crop,
+- scale,
+- horizontal spacing,
+- decorative placement.
 
-Reel-symbol inspection must remain reliable without stealing normal swipe/scroll gestures from a host page.
+It must not change:
+- reel topology,
+- meaning of controls,
+- visibility of critical values,
+- causal readability.
 
-## Asset ingestion
+If one orientation is preferred, make the other graceful rather than broken.
 
-Before implementation inspect:
-- dimensions,
-- transparency,
-- alpha fringes,
-- extra whitespace,
-- pivots/origins,
-- naming,
-- duplicate variants,
-- texture/atlas opportunities,
-- color-space assumptions,
-- Spine atlas/runtime compatibility.
+## Background vs gameplay crop
 
-Flag bad source assets instead of burying permanent hacks in layout code.
+Background can cover and crop.
 
-## SVG/live text preference
+Gameplay should not.
 
-For utility UI:
-- prefer SVG/currentColor where appropriate,
-- prefer live text over raster labels,
-- keep icons themeable,
-- avoid rasterizing simple controls.
+Characters/decorations may have controlled crop zones when concept allows.
 
-For immersive slot art, follow the supplied production asset format and performance budget.
+Never solve a difficult aspect ratio by chopping off the spin button, multiplier reel or win value.
 
-## External UI kits
+## Controls
 
-A supplied UI kit governs only the surface it was designed for.
+Primary controls should remain visually obvious against theme art.
 
-For the uploaded ArtPrompter Studio kit specifically:
-- its macOS-inspired geometry, tokens and glass actions are appropriate for tool/editor surfaces,
-- currentColor SVG masters are implementation-friendly,
-- normal controls are intentionally calm,
-- special glass treatment is intentionally limited,
-- its 40/44 px interaction target and reduced-motion guidance are useful.
+Theme can alter materials and shape language, but usability wins:
+- spin remains dominant,
+- utility controls remain subordinate,
+- disabled states are clear,
+- turbo/auto states are legible,
+- feature-buy/bet controls are not confused with decorative art.
 
-Do not automatically apply ArtPrompter's macOS/glass visual language to the reel game itself. The slot screen remains governed by its approved theme/concept.
+## Live text vs baked text
 
-## Responsive strategy
+Use live text for:
+- balances,
+- bets,
+- wins,
+- dynamic multipliers,
+- jackpot amounts,
+- localized feature messages where practical.
 
-Support at least:
-- desktop,
-- tablet,
-- portrait phone,
-- landscape phone.
+Do not bake dynamic financial values into images.
 
-Avoid dozens of breakpoint-specific pixel patches.
-
-Prefer:
-- anchors,
-- proportional regions,
-- min/max scale constraints,
-- safe-area variables,
-- aspect-ratio modes.
-
-If the game has a preferred orientation, still handle the non-preferred orientation gracefully.
-
-## Text and localization
-
-Do not bake text into art if it needs localization, dynamic values or accessibility.
-
-Plan for:
-- longer localized labels,
-- comma/decimal differences,
-- currency symbol placement,
-- compact jackpot formatting,
-- dynamic font sizing within bounded limits.
-
-Numbers should never overlap decorative frames at common extremes.
+For localization plan:
+- longer labels,
+- different decimal/group separators,
+- currency placement,
+- large jackpot digits,
+- fallback fonts/glyph coverage.
 
 ## Concept fidelity review
 
-Before signoff compare runtime against approved concept:
-- reel placement,
+Before signoff compare runtime to approved concept:
+- reel size and placement,
 - logo scale,
 - character silhouette,
+- major material/color blocks,
 - negative space,
+- feature prominence,
 - control hierarchy,
 - background crop,
-- feature prominence,
-- visual balance.
+- focal sequence.
 
-A responsive implementation can change crop and spacing without losing the original visual story.
+Do not approve solely from code correctness.
+
+## Reskin safety check
+
+A normal art reskin should not require edits to:
+- outcome generation,
+- paytable,
+- reel weights,
+- feature odds.
+
+If changing art appears to require RED-zone code edits, stop and inspect the architecture before proceeding.
