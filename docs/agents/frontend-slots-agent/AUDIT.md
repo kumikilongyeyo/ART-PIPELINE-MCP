@@ -1,8 +1,6 @@
 # FRONTEND Slots Agent — Source-Pack Audit
 
-This audit was rebuilt from the actual Slot Engines Source Pack.
-
-The earlier ArtPrompter-based pass is superseded. ArtPrompter assumptions are not part of this agent.
+This audit was rebuilt from the actual Slot Engines Source Pack and supersedes the earlier wrong-file pass.
 
 ## 1. The two engines should be fused, not ranked
 
