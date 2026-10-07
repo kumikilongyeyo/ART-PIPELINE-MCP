@@ -1,184 +1,297 @@
-# FRONTEND Slots Agent — QA, Debugging, Recovery and Performance
+# FRONTEND Slots Agent — QA, Replay, Recovery and Performance
 
-Use this playbook when validating a build, hunting bugs, optimizing or preparing release.
+Use this playbook when validating a title, debugging rare states, reviewing art/VFX or preparing a web/mobile release.
 
-## QA philosophy
+The strongest QA system combines:
+- Showcase-style full valid scenario results and final-board/balance checks,
+- Jeepney-style presentation-only replay tools,
+- recorded normalized-result replay,
+- deterministic cosmetic randomness,
+- visual regression.
 
-Random spinning is not a QA strategy.
+## Random spinning is not QA
 
-Every important state should be reproducible through:
-- force mode,
-- recorded round replay,
-- deterministic fixture,
-- direct state harness.
+Every important state should be directly reproducible.
 
-## Required test states
+Use three layers.
 
-At minimum:
-- boot/loading,
-- idle/ready,
-- losing spin,
+### 1. Full-result fixtures
+
+A fixture is a valid normalized game result.
+
+Use it to verify:
+- result contract,
+- grid/reel state,
+- feature state,
+- final board,
+- settlement/balance behavior in the appropriate environment,
+- complete real presentation path.
+
+### 2. Presentation-only replay
+
+Use for rapid art/VFX work:
+- wheel spin/settle,
+- anticipation,
+- wild/scatter animation,
+- EX NUDGE,
+- paylines,
+- banners,
+- big-win treatment,
+- bonus transition.
+
+Presentation replay must never credit/debit balance or pretend to be a payable spin.
+
+### 3. Recorded round replay
+
+Capture normalized real/mock result JSON and replay it deterministically.
+
+This is the preferred way to reproduce bugs and compare visual changes.
+
+## Required scenario library
+
+At minimum cover:
+- loss,
 - small win,
 - medium win,
 - large/big win,
 - wild,
 - scatter,
-- anticipation success/failure,
-- bonus trigger,
-- bonus active,
-- bonus exit,
-- multiplier/collector,
-- jackpot test state if present,
+- anticipation failure,
+- anticipation success,
+- feature trigger,
+- feature active,
+- feature exit,
+- multiplier,
+- collector,
+- wheel result,
+- EX NUDGE if applicable,
+- cascade/tumble chain if applicable,
+- jackpot test state if applicable,
+- free-spin retrigger if supported,
 - turbo,
+- slam,
 - skip,
-- reduced motion,
-- orientation change,
-- hidden/resume tab,
-- asset failure,
-- reconnect/recovery.
+- reduced motion.
 
-## Debug overlay
+Mechanic-specific titles add their own edge cases.
 
-Development builds should be able to show:
-- FPS/frame time,
-- current game state,
-- active round ID,
-- presentation sequence ID,
-- current event,
-- bet,
-- total win,
-- feature state,
-- RTP profile ID,
-- math version,
-- force/replay status,
-- asset-load state,
-- active Spine animation,
-- viewport and safe-area values,
-- timing profile.
+## Source-pack QA invariants
 
-Keep this removable and disabled in production.
+Preserve the spirit of Showcase QA:
+- a requested scenario actually occurs,
+- presented final board matches normalized finalGrid/result,
+- round ends in an allowed stable state,
+- balance reconciliation is correct for the active demo/production authority.
 
-## Structured logs
+Add:
+- no stale presentation writes after round change,
+- no duplicate settlement,
+- symbol inspector matches active paytable,
+- feature entry/exit reaches a stable state,
+- normal/turbo/skip produce the same final logical result.
 
-Prefer domain tags:
+## Deterministic VisualRng
 
-    [MATH]
-    [STATE]
-    [PRESENTATION]
-    [SPINE]
-    [VFX]
-    [AUDIO]
-    [ASSET]
-    [NETWORK]
-    [RECOVERY]
+Presentation randomness should be reproducible for screenshot/video comparison.
 
-Include round/sequence IDs where useful.
+Use a dedicated seeded visual RNG for:
+- particles,
+- harmless shake offsets,
+- decorative reel filler,
+- cosmetic wheel wobble,
+- ambient sparkle placement.
 
-A good log tells a developer what failed and in what state.
+Seed from stable identity such as:
+
+    roundId + sequenceId + eventKey
+
+Never share this RNG with outcome generation.
 
 ## Visual regression
 
-Capture reference screenshots/videos for:
-- base screen,
+Capture key screenshots or short clips for:
+- base idle,
 - spin,
+- stopped board,
+- symbol payout inspector,
 - standard win,
-- special symbols,
-- trigger anticipation,
-- bonus entry,
+- major special symbol,
+- anticipation,
+- bonus trigger,
 - bonus mode,
+- wheel,
+- collector/multiplier,
 - big win,
 - bonus exit,
-- portrait,
-- landscape,
-- desktop.
+- portrait phone,
+- landscape phone,
+- representative desktop/tablet.
 
-Compare after major frontend/layout changes.
+Use the same fixture and visual seed for comparisons.
+
+## Debug overlay
+
+Development builds should optionally display:
+- FPS/frame time,
+- game state,
+- provider type,
+- request ID,
+- round ID,
+- presentation sequence ID,
+- active event,
+- bet,
+- total win,
+- feature/free-spin state,
+- mathVersion,
+- rtpProfileId,
+- config checksum if available,
+- timing profile,
+- visual seed,
+- active Spine animation,
+- asset load state,
+- viewport/safe-area values.
+
+Disable/remove it for production.
+
+## Structured logging
+
+Prefer tagged logs:
+- MATH,
+- NETWORK,
+- STATE,
+- PRESENTATION,
+- REELS,
+- SPINE,
+- VFX,
+- AUDIO,
+- ASSET,
+- RECOVERY.
+
+Include request/round/sequence identity where useful.
+
+A useful log explains what failed and in which state.
+
+## Network fault tests
+
+Production/provider integration should test:
+- timeout before result,
+- connection drop after request submission,
+- duplicate response,
+- stale response after a later state,
+- invalid schema,
+- mismatched request ID,
+- reconnect and authoritative status recovery.
+
+Do not verify network behavior only on happy-path localhost.
+
+## Browser lifecycle tests
+
+Test:
+- visibility hidden/resume,
+- pagehide/pageshow,
+- orientation change during spin/presentation,
+- dynamic mobile browser bars,
+- audio interruption,
+- refresh after authoritative settlement,
+- reconnect during feature,
+- screen lock/resume where practical.
+
+On resume, the game must not replay settlement or allow stale timers to mutate current state.
 
 ## Performance budget
 
-Track at least:
-- JS bundle size,
-- startup asset bytes,
+Track at minimum:
+- JS bundle/startup bytes,
+- core asset download,
+- feature asset download,
 - texture memory estimate,
 - atlas count,
 - Spine skeleton count,
 - particle count,
-- draw calls or renderer batches where available,
-- DOM node count if DOM-heavy,
+- renderer batches/draw calls where available,
+- DOM nodes if DOM-heavy,
 - long tasks,
 - frame time/FPS,
 - audio memory.
 
-Do not fix tiny aesthetic issues with permanently expensive effects.
+The exact budget is title/platform specific. Measure rather than guessing.
 
-## Loading strategy
+## Asset loading
 
-Split assets:
-- core — required to start base game,
-- feature — loaded before likely feature entry,
-- optional — rare/large assets.
+Split:
+- core — required for base-game readiness,
+- feature — preloaded before likely feature entry,
+- optional — rare/heavy sequences.
 
-Critical bonus assets must be ready before transition begins.
+Never enter a cinematic bonus transition and then stall because its first critical asset is still downloading.
 
 ## Runtime discipline
 
 Avoid:
-- layout thrash in the animation loop,
-- repeated DOM queries on every frame,
-- unbounded particle creation,
-- orphaned timers/listeners,
+- layout thrash in render loop,
+- repeated DOM lookup every frame,
+- unbounded particles,
+- orphaned listeners/timers,
 - duplicate Spine instances,
-- loading giant full-resolution textures for tiny UI.
+- full-resolution textures for tiny UI,
+- permanent expensive blur/filter stacks for subtle effects.
 
-Use a shared animation clock/timeline where practical.
+Use a central clock/ticker and lifecycle-managed subscriptions.
 
-## Mobile resilience
+## Low-end mobile
 
-Test actual device behavior:
-- low-power mode,
-- background/foreground,
-- audio interruption,
-- orientation rotation,
-- dynamic browser chrome,
+Do not optimize only on a desktop GPU.
+
+Test:
+- real phone viewport,
+- reduced memory conditions where available,
+- thermal/low-power behavior,
+- portrait and landscape,
 - touch latency,
-- memory pressure.
+- background/resume,
+- sustained feature VFX.
 
-Desktop emulation alone is insufficient.
+Provide graceful VFX quality reduction when needed without destroying result readability.
 
-## Recovery tests
+## RED-change test gate
 
-Verify:
-- refresh after settled round,
-- reconnect with same round,
-- duplicate result message,
-- stale delayed callback,
-- skip midway through big win,
-- turbo toggle between rounds,
-- bonus assets delayed,
-- one optional visual asset missing.
+Any RED math change must trigger:
+- math unit/rule tests,
+- simulations required by the project,
+- scenario regression,
+- result-contract tests.
 
-The final balance/win/state must remain correct.
+Record the changed math version/profile.
+
+Do not hide a math change inside a frontend PR.
 
 ## Release gates
 
-Before release:
-- force mode unavailable,
-- debug overlay unavailable by default,
-- dev endpoints removed/locked,
-- no console spam of sensitive production payloads,
-- no unsupported RTP profile can be selected,
-- all symbol payout inspectors match active paytable,
-- all feature entry/exit states recover correctly,
-- reduced-motion path remains understandable,
-- mobile safe areas verified,
-- no known stale-event race remains.
+Before shipping:
+- production provider selected correctly,
+- mock/scenario provider cannot be accidentally enabled,
+- force panel unavailable,
+- presentation replay unavailable to ordinary players,
+- debug overlay disabled,
+- no sensitive result payload spam,
+- no unsupported RTP profile selectable,
+- payout inspector matches active configuration,
+- skip/slam cannot duplicate round actions,
+- duplicate/stale responses are safe,
+- refresh/reconnect cannot double settle,
+- feature entry/exit recovers,
+- reduced-motion path still communicates results,
+- portrait/landscape safe areas verified,
+- performance checked on representative mobile hardware.
 
-## Definition of performance success
+## Definition of QA success
 
-Optimization is successful only if it preserves:
-- readability,
-- cause/effect communication,
-- approved art hierarchy,
-- final-state correctness.
+A feature passes only when:
+- logical final state is correct,
+- the player can understand the result,
+- the same fixture can be reproduced,
+- art/VFX can be reviewed without random grinding,
+- interruption/recovery is safe,
+- mobile performance is acceptable.
 
-A fast game that visually lies or loses the concept is not optimized; it is broken differently.
+A pretty animation that cannot be reliably reproduced or recovered is not production-ready.
