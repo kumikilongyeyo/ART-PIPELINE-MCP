@@ -1,6 +1,8 @@
 # FRONTEND Slots Agent
 
-A Claude Code specialist for art-first web/mobile slot implementation.
+A Claude Code specialist for porting and polishing slot games on web/mobile while preserving approved art direction and maintaining a clean math/RTP boundary.
+
+This version was rebuilt from the actual Slot Engines Source Pack rather than from a generic UI kit.
 
 ## Agent
 
@@ -8,49 +10,54 @@ Project subagent:
 
     .claude/agents/frontend-slots-agent.md
 
-The agent is intentionally concise and loads deeper playbooks only when relevant.
+The agent does not restrict its tool list, so it can inherit connected MCP tools such as ART-PIPELINE-MCP when available.
 
-## What it specializes in
+## Source-pack intelligence
 
-- preserving approved slot concept/layout,
-- web/mobile front-end porting,
-- reel/HUD composition,
-- symbol tap/click payout inspection,
-- win and prize eye-leading,
-- bonus entry/exit choreography,
-- PG Soft / FA CHAI / OMNIPLAY / GameZone-style interaction discipline without cloning,
-- Spine/VFX/audio integration,
-- normalized math/RTP adapter boundaries,
-- state machines and presentation queues,
-- deterministic forced states and replay,
-- mobile safe areas and performance,
-- debugging/recovery.
+The agent deliberately combines the strongest patterns from both supplied engines:
+
+- 01_slot-showcase — cleaner result-provider boundary, normalized spin results, configurable game families, forced valid scenarios and one-click QA.
+- 02_jeepney-4x3-wheel-engine — stronger authored timing, skip/slam behavior, wheel/EX NUDGE presentation, Spine/VFX integration and presentation-only replay tools.
+
+The target architecture uses the Showcase-style provider seam with the Jeepney-style presentation discipline.
+
+## Core behavior
+
+The agent enforces:
+- approved concept/layout as visual authority,
+- engine selection before rebuilding,
+- GREEN / YELLOW / RED change classification,
+- tap/click stopped symbols for payout/function inspection,
+- cause-to-effect win explanation,
+- deliberate eye-leading when prize values appear,
+- authored bonus entry and exit,
+- config-driven normal/turbo/reduced-motion timing,
+- cancellable presentation sequences,
+- server-authoritative production settlement by default,
+- versioned RTP/math identity,
+- deterministic full-result and presentation replay,
+- responsive/mobile-safe layout,
+- release gates for dev/force tooling.
 
 ## Playbooks
 
-- ART_AND_LAYOUT.md
-- PRESENTATION.md
-- MATH_AND_STATE.md
-- QA_AND_PERFORMANCE.md
-- AUDIT.md
-- slot-manifest.example.json
+- SOURCE_ENGINE_MAP.md — which supplied engine to use and protected zones.
+- ART_AND_LAYOUT.md — concept fidelity, design-space layout, assets, responsive behavior.
+- PRESENTATION.md — eye-leading, wins, VFX, audio, timing, bonus transitions.
+- MATH_AND_STATE.md — result providers, RTP, settlement, state, idempotency/recovery.
+- QA_AND_PERFORMANCE.md — fixtures, replay, visual regression, performance, lifecycle.
+- AUDIT.md — gaps found by scrutinizing the real source pack.
+- slot-manifest.example.json — project bootstrap contract.
 
-## Recommended project bootstrap
+## Recommended use
 
-For a new slot implementation:
+For a new title or port:
+1. copy the title/engine instead of modifying the source-pack master,
+2. adapt slot-manifest.example.json,
+3. give Claude the approved concept and source art,
+4. ask it to use frontend-slots-agent,
+5. let the agent choose the closest source engine,
+6. review its GREEN/YELLOW/RED change classification before deep edits,
+7. keep rare-state fixtures/replays working while presentation is polished.
 
-1. Put the approved concept/art spec in the project.
-2. Copy/adapt slot-manifest.example.json.
-3. Identify the real math authority and active paytable.
-4. Ask Claude to use the frontend-slots-agent for the implementation/audit.
-5. Require a first-pass architecture/layout report before large rewrites.
-6. Add deterministic round fixtures before polishing rare features.
-7. Validate portrait and landscape mobile early.
-
-## Key design decision
-
-The agent does not hard-wire a visual style.
-
-It standardizes behavior and technical boundaries while allowing each slot to retain its own art direction.
-
-The same agent can work on an action/fighting slot, diner reskin, Greek temple game, horror theme, or another layout without forcing them to look alike.
+The agent standardizes behavioral quality, not visual style. Different themes should share strong interaction grammar without being forced into the same look.
