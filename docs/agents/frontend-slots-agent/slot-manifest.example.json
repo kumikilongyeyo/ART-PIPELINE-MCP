@@ -1,57 +1,76 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "2.0",
   "gameId": "example-slot",
+  "source": {
+    "family": "showcase-cascade | showcase-reelmult | jeepney-4x3-wheel | new-engine",
+    "referenceProject": "TBD",
+    "workFromCopy": true,
+    "changeClass": ["GREEN"]
+  },
   "concept": {
     "referenceWidth": 1080,
     "referenceHeight": 1920,
     "preferredOrientation": "portrait",
     "backgroundPolicy": "cover",
-    "gameplayPolicy": "contain-safe"
+    "gameplayPolicy": "contain-safe",
+    "approvedConceptPath": "TBD"
   },
   "layout": {
     "reels": { "x": 120, "y": 520, "width": 840, "height": 720 },
+    "specialReelOrWheel": null,
     "winZone": { "anchor": "bottom-center", "safeMargin": 32 },
     "controlsZone": { "anchor": "bottom", "safeAreaAware": true },
     "featureZones": []
   },
-  "layers": [
-    "background",
-    "environment-back",
-    "rear-vfx",
-    "reel-frame",
-    "symbols",
-    "front-vfx",
-    "foreground-art",
-    "gameplay-hud",
-    "reward-overlay",
-    "modal-debug"
-  ],
+  "assets": {
+    "preserveStableIds": true,
+    "spineSemanticStates": ["idle", "land", "win", "anticipation", "trigger", "loop", "exit"],
+    "artPipelineMcpAllowed": true
+  },
   "math": {
-    "mode": "adapter",
-    "productionAuthority": "server",
+    "authority": "server | demo-local",
+    "provider": "ServerResultProvider | MockResultProvider | ScenarioResultProvider | RecordedResultProvider",
+    "contractVersion": "TBD",
     "mathVersion": "TBD",
     "rtpProfileId": "TBD",
+    "configChecksum": "TBD",
     "currencyStorage": "integer-credits",
-    "paytableSource": "math-config"
+    "paytableSource": "active-math-config",
+    "redChangesRequireSimulation": true
   },
   "presentation": {
     "grammar": ["cause", "recognition", "focus", "reward", "read", "release"],
-    "timingProfile": "normal",
-    "turboProfile": "turbo",
-    "reducedMotionProfile": "reduced-motion",
+    "timingProfiles": ["normal", "turbo1", "turbo2", "reducedMotion"],
     "symbolTapShowsPayout": true,
-    "bonusTransitionRequired": true
+    "symbolInspectorOnlyWhenSettled": true,
+    "bonusTransitionDirector": true,
+    "cancellableSequences": true,
+    "roundAndSequenceIds": true,
+    "seededVisualRng": true
   },
   "qa": {
-    "forceMode": true,
+    "fullResultFixtures": true,
+    "presentationOnlyReplay": true,
     "recordedRoundReplay": true,
-    "debugOverlay": true,
-    "productionForceMode": false
+    "boardResultDiff": true,
+    "settlementReconciliation": true,
+    "visualRegression": true,
+    "productionDevTools": false
+  },
+  "recovery": {
+    "idempotentRoundProtocol": true,
+    "runtimeSchemaValidation": true,
+    "requestTimeoutAbort": true,
+    "visibilityResume": true,
+    "refreshReconnect": true,
+    "staleCallbackRejection": true
   },
   "performance": {
     "mobileFirst": true,
     "preloadFeatureAssetsBeforeTransition": true,
     "measureFrameTime": true,
-    "measureTextureBudget": true
+    "measureTextureMemory": true,
+    "measureRendererBatches": true,
+    "testRepresentativePhone": true
   }
 }
