@@ -1,11 +1,14 @@
 {
   "schemaVersion": "2.0",
   "gameId": "example-slot",
+  "buildIntent": "showcase | production",
   "source": {
     "family": "showcase-cascade | showcase-reelmult | jeepney-4x3-wheel | new-engine",
     "referenceProject": "TBD",
     "workFromCopy": true,
-    "changeClass": ["GREEN"]
+    "changeClass": [
+      "GREEN"
+    ]
   },
   "concept": {
     "referenceWidth": 1080,
@@ -16,15 +19,34 @@
     "approvedConceptPath": "TBD"
   },
   "layout": {
-    "reels": { "x": 120, "y": 520, "width": 840, "height": 720 },
+    "reels": {
+      "x": 120,
+      "y": 520,
+      "width": 840,
+      "height": 720
+    },
     "specialReelOrWheel": null,
-    "winZone": { "anchor": "bottom-center", "safeMargin": 32 },
-    "controlsZone": { "anchor": "bottom", "safeAreaAware": true },
+    "winZone": {
+      "anchor": "bottom-center",
+      "safeMargin": 32
+    },
+    "controlsZone": {
+      "anchor": "bottom",
+      "safeAreaAware": true
+    },
     "featureZones": []
   },
   "assets": {
     "preserveStableIds": true,
-    "spineSemanticStates": ["idle", "land", "win", "anticipation", "trigger", "loop", "exit"],
+    "spineSemanticStates": [
+      "idle",
+      "land",
+      "win",
+      "anticipation",
+      "trigger",
+      "loop",
+      "exit"
+    ],
     "artPipelineMcpAllowed": true
   },
   "math": {
@@ -39,8 +61,20 @@
     "redChangesRequireSimulation": true
   },
   "presentation": {
-    "grammar": ["cause", "recognition", "focus", "reward", "read", "release"],
-    "timingProfiles": ["normal", "turbo1", "turbo2", "reducedMotion"],
+    "grammar": [
+      "cause",
+      "recognition",
+      "focus",
+      "reward",
+      "read",
+      "release"
+    ],
+    "timingProfiles": [
+      "normal",
+      "turbo1",
+      "turbo2",
+      "reducedMotion"
+    ],
     "symbolTapShowsPayout": true,
     "symbolInspectorOnlyWhenSettled": true,
     "bonusTransitionDirector": true,
@@ -72,5 +106,35 @@
     "measureTextureMemory": true,
     "measureRendererBatches": true,
     "testRepresentativePhone": true
+  },
+  "economics": {
+    "simulator": "tools/sim.mjs (bonuses played in full)",
+    "targetReturn": "TBD (showcase: roughly at or below price for every option)",
+    "maxWinX": 5000,
+    "maxWinScope": "round (trigger spin + whole feature)",
+    "extraBet": {
+      "cost": 1.25,
+      "visibleBenefit": "TBD",
+      "measuredReturn": "TBD"
+    },
+    "featureBuys": [
+      {
+        "id": "wts",
+        "label": "feature spins (cheap tier)",
+        "priceX": "TBD",
+        "measuredMeanX": "TBD"
+      },
+      {
+        "id": "standard",
+        "priceX": "TBD",
+        "measuredMeanX": "TBD"
+      },
+      {
+        "id": "enhanced",
+        "priceX": "TBD",
+        "measuredMeanX": "TBD",
+        "naturalRoute": "TBD"
+      }
+    ]
   }
 }

@@ -146,6 +146,10 @@ Frontend must not:
 
 Any changes to reel strips, paytable, feature odds, multiplier distribution or feature-buy return require math tests/simulation.
 
+SHOWCASE exception: when the build intent is a showcase/prototype on the local demo engine, tuning
+that engine is in scope (see FEATURE_DESIGN_AND_ECONOMICS.md §1). It still goes through the
+simulator, stays labelled placeholder, and never touches a production math profile.
+
 ## Certification wording
 
 The source pack contains mock/tuned math paths and simulation-oriented values. Treat them as development references.

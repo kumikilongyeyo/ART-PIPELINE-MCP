@@ -90,6 +90,18 @@ Add:
 - feature entry/exit reaches a stable state,
 - normal/turbo/skip produce the same final logical result.
 
+## Capturing fleeting beats
+
+Short beats (a charge, a multiplier sum, a max-win screen) are easy to miss with fixed sleeps.
+In a browser harness, wait on a DOM condition (the beat's element or class appearing), then
+screenshot. Record `lastResult` per spin while a feature runs, to check invariants such as
+"every Wild Throw Spin had a Wild" or "the ladder reset each spin".
+
+## Feature audit
+
+For every headline mechanic, confirm from the math step order that it changes the outcome
+(see FEATURE_DESIGN_AND_ECONOMICS.md §2). A beautiful animation over a no-op is a shipped bug.
+
 ## Deterministic VisualRng
 
 Presentation randomness should be reproducible for screenshot/video comparison.

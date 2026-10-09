@@ -251,6 +251,26 @@ Do not begin the next cascade before the previous cause/result can be understood
 
 Multipliers that persist/escalate should receive a visible update beat before the next evaluation.
 
+## Charge-and-release beat (rare super-symbol)
+
+For a rare special (e.g. a Golden Wild that throws several Wilds), one loud, readable moment beats
+many small ones. Sequence that tested well:
+1. **Charge (~0.9 s):** the symbol scales up and shivers, the rest of the board dims, rings converge
+   on it, and a rising growl/scream builds.
+2. **Release:** a flash, a heavy shake and a drum hit.
+3. **Staggered hits (~150-170 ms apart):** each thrown object lands as its own beat with its own
+   sound; don't fire them all on one frame.
+4. **Persistent result:** anything that stays on the board (multiplier Wilds) keeps a badge that sits
+   **outside** the symbol element, so art swaps and symbol re-renders don't drop it.
+
+## Combining multipliers on screen
+
+- Show the parts small and the total big: a `x2 + x3 + x5` line above a large `x10`.
+  A single-line label overflowed the board at 7 parts; cap the label width to the board.
+- Pulse the contributing badges while the total shows.
+- In a bonus where the multiplier jumps off its normal +step ladder, rebuild the wheel/ladder around
+  the old value and roll one position to the new one, rather than computing a ladder index.
+
 ## Presentation timing
 
 The Jeepney engine's config-driven normal/turbo profiles are the preferred direction. The Showcase hard-coded waits should be refactored when touching those paths.

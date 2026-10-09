@@ -62,6 +62,7 @@ The agent enforces:
 - PRESENTATION.md — eye-leading, wins, VFX, audio, timing, bonus transitions.
 - MATH_AND_STATE.md — result providers, RTP, settlement, state, idempotency/recovery.
 - QA_AND_PERFORMANCE.md — fixtures, replay, visual regression, performance, lifecycle.
+- FEATURE_DESIGN_AND_ECONOMICS.md — showcase vs production intent, feature audit, economics lab (sim measurements), Extra Bet / buy / multiplier traps, retention levers, max-win cap.
 - AUDIT.md — gaps found by scrutinizing the real source pack.
 - slot-manifest.example.json — project bootstrap contract.
 
