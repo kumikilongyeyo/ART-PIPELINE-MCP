@@ -97,6 +97,22 @@ This repo includes a Claude Code specialist rebuilt from the actual **Slot Engin
 - Source-engine selection map: [SOURCE_ENGINE_MAP.md](docs/agents/frontend-slots-agent/SOURCE_ENGINE_MAP.md)
 - Source-pack audit: [AUDIT.md](docs/agents/frontend-slots-agent/AUDIT.md)
 
+### Install or update (any project, macOS or Windows)
+
+Installs the agent for your user, so it shows up in every project, not only this repo. Run the same command again to update.
+
+macOS / Linux (Terminal):
+
+    curl -fsSL https://raw.githubusercontent.com/kumikilongyeyo/ART-PIPELINE-MCP/main/scripts/install-frontend-slots-agent.sh | bash
+
+Windows (PowerShell):
+
+    irm https://raw.githubusercontent.com/kumikilongyeyo/ART-PIPELINE-MCP/main/scripts/install-frontend-slots-agent.ps1 | iex
+
+From a clone: double-click `scripts/install-frontend-slots-agent.command` (macOS) or `scripts\install-frontend-slots-agent.cmd` (Windows). It pulls the latest commit, then installs. Add `--uninstall` / `-Uninstall` to remove it.
+
+It writes `~/.claude/agents/frontend-slots-agent.md` plus the playbooks in `~/.claude/agent-docs/frontend-slots-agent/` (with a `VERSION` file), and points the agent's playbook links there, so they resolve from any project. Open a **new** Claude Code session afterwards: agents are only read at startup.
+
 The agent combines the Showcase engine's clean result-provider/QA boundary with the Jeepney 4x3+1 engine's stronger timing, skip/slam, wheel, Spine and VFX presentation patterns. It also standardizes reel-symbol payout inspection, reward eye-leading, bonus transitions, RTP/math version boundaries, deterministic replay and mobile recovery.
 
 ## License

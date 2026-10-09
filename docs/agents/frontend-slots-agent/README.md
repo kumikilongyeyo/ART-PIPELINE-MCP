@@ -12,6 +12,22 @@ Project subagent:
 
 The agent does not restrict its tool list, so it can inherit connected MCP tools such as ART-PIPELINE-MCP when available.
 
+## Install or update (any project, macOS or Windows)
+
+Installs the agent for your user, so it shows up in every project, not only this repo. Run the same command again to update.
+
+macOS / Linux (Terminal):
+
+    curl -fsSL https://raw.githubusercontent.com/kumikilongyeyo/ART-PIPELINE-MCP/main/scripts/install-frontend-slots-agent.sh | bash
+
+Windows (PowerShell):
+
+    irm https://raw.githubusercontent.com/kumikilongyeyo/ART-PIPELINE-MCP/main/scripts/install-frontend-slots-agent.ps1 | iex
+
+From a clone: double-click `scripts/install-frontend-slots-agent.command` (macOS) or `scripts\install-frontend-slots-agent.cmd` (Windows). It pulls the latest commit, then installs. Add `--uninstall` / `-Uninstall` to remove it.
+
+It writes `~/.claude/agents/frontend-slots-agent.md` plus the playbooks in `~/.claude/agent-docs/frontend-slots-agent/` (with a `VERSION` file), and points the agent's playbook links there, so they resolve from any project. Open a **new** Claude Code session afterwards: agents are only read at startup.
+
 ## Source-pack intelligence
 
 The agent deliberately combines the strongest patterns from both supplied engines:
