@@ -11,9 +11,10 @@
 #   --local       install from this clone as-is (no git pull, no download)
 #   --uninstall   remove the installed agent and its docs
 #
-# What it writes (user-level, so the agent shows in EVERY project):
+# What it writes (user-level, so it works in EVERY project):
 #   ~/.claude/agents/frontend-slots-agent.md
 #   ~/.claude/agent-docs/frontend-slots-agent/   (playbooks the agent reads)
+#   ~/.claude/skills/pages-site/                 (edit + redeploy a *.pages.dev site from just its link)
 # The agent's playbook links are rewritten to that docs folder, so they
 # resolve no matter which project Claude Code is opened in.
 set -euo pipefail
@@ -24,6 +25,7 @@ NAME="frontend-slots-agent"
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 AGENT_DEST="$CLAUDE_DIR/agents/$NAME.md"
 DOCS_DEST="$CLAUDE_DIR/agent-docs/$NAME"
+SKILL_DEST="$CLAUDE_DIR/skills/pages-site"
 
 mode="auto"
 for arg in "$@"; do
@@ -37,8 +39,8 @@ done
 
 if [ "$mode" = "uninstall" ]; then
   rm -f "$AGENT_DEST"
-  rm -rf "$DOCS_DEST"
-  echo "Removed $NAME. Restart Claude Code to drop it from the agent list."
+  rm -rf "$DOCS_DEST" "$SKILL_DEST"
+  echo "Removed $NAME and the pages-site skill. Restart Claude Code to drop them."
   exit 0
 fi
 
@@ -91,10 +93,17 @@ printf '%s\n' "$version" > "$DOCS_DEST/VERSION"
 sed "s#docs/agents/$NAME/#$DOCS_DEST/#g" "$src/.claude/agents/$NAME.md" > "$AGENT_DEST.tmp"
 mv "$AGENT_DEST.tmp" "$AGENT_DEST"
 
+if [ -d "$src/skills/pages-site" ]; then
+  rm -rf "$SKILL_DEST"
+  mkdir -p "$SKILL_DEST"
+  cp -R "$src/skills/pages-site/." "$SKILL_DEST/"
+fi
+
 echo
 echo "Installed $NAME ($version)"
 echo "  agent: $AGENT_DEST"
 echo "  docs:  $DOCS_DEST"
+[ -d "$SKILL_DEST" ] && echo "  skill: $SKILL_DEST  (give Claude a *.pages.dev link and ask for changes)"
 echo
 echo "Start a NEW Claude Code session (agents load at startup), then ask:"
 echo "  \"use the frontend-slots-agent to ...\"   or type  @agent-$NAME"

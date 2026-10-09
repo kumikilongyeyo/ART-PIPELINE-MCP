@@ -115,6 +115,13 @@ It writes `~/.claude/agents/frontend-slots-agent.md` plus the playbooks in `~/.c
 
 The agent combines the Showcase engine's clean result-provider/QA boundary with the Jeepney 4x3+1 engine's stronger timing, skip/slam, wheel, Spine and VFX presentation patterns. It also standardizes reel-symbol payout inspection, reward eye-leading, bonus transitions, RTP/math version boundaries, deterministic replay and mobile recovery.
 
+## pages-site skill: edit a website from its link
+
+`skills/pages-site/` lets Claude Code change a Cloudflare Pages site from just its `*.pages.dev` link, on any
+device: it pulls exactly what is live, edits, deploys to a preview, verifies every file, then deploys live.
+The site's file list is kept privately in Workers KV, and a deploy is refused if another device deployed
+since the pull, so two machines can't overwrite each other. The FRONTEND Slots installer above installs it too.
+
 ## License
 
 MIT. Spine engine derived from [egorfedorov/spine-mcp](https://github.com/egorfedorov/spine-mcp) via CLAUDE-SPINE; see LICENSE.

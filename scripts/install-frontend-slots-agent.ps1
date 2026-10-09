@@ -15,6 +15,7 @@
 # What it writes (user-level, so the agent shows in EVERY project):
 #   %USERPROFILE%\.claude\agents\frontend-slots-agent.md
 #   %USERPROFILE%\.claude\agent-docs\frontend-slots-agent\   (playbooks the agent reads)
+#   %USERPROFILE%\.claude\skills\pages-site\                 (edit + redeploy a *.pages.dev site from just its link)
 # The agent's playbook links are rewritten to that docs folder, so they
 # resolve no matter which project Claude Code is opened in.
 param(
@@ -31,11 +32,13 @@ $Name = 'frontend-slots-agent'
 $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
 $AgentDest = Join-Path $ClaudeDir "agents\$Name.md"
 $DocsDest = Join-Path $ClaudeDir "agent-docs\$Name"
+$SkillDest = Join-Path $ClaudeDir 'skills\pages-site'
 
 if ($Uninstall) {
     Remove-Item -LiteralPath $AgentDest -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $DocsDest -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "Removed $Name. Restart Claude Code to drop it from the agent list."
+    Remove-Item -LiteralPath $SkillDest -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "Removed $Name and the pages-site skill. Restart Claude Code to drop them."
     return
 }
 
@@ -99,6 +102,13 @@ try {
     $text = [IO.File]::ReadAllText($agentSrc, $utf8)
     $text = $text.Replace("docs/agents/$Name/", $docsForLinks)
     [IO.File]::WriteAllText($AgentDest, $text, $utf8)
+
+    $skillSrc = Join-Path $src 'skills\pages-site'
+    if (Test-Path -LiteralPath $skillSrc) {
+        Remove-Item -LiteralPath $SkillDest -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path $SkillDest | Out-Null
+        Copy-Item -Path (Join-Path $skillSrc '*') -Destination $SkillDest -Recurse -Force
+    }
 }
 finally {
     if ($tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
@@ -108,6 +118,7 @@ Write-Host ''
 Write-Host "Installed $Name ($version)"
 Write-Host "  agent: $AgentDest"
 Write-Host "  docs:  $DocsDest"
+if (Test-Path -LiteralPath $SkillDest) { Write-Host "  skill: $SkillDest  (give Claude a *.pages.dev link and ask for changes)" }
 Write-Host ''
 Write-Host 'Start a NEW Claude Code session (agents load at startup), then ask:'
 Write-Host "  `"use the frontend-slots-agent to ...`"   or type  @agent-$Name"
