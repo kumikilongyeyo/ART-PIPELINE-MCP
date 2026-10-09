@@ -97,7 +97,15 @@ In a browser harness, wait on a DOM condition (the beat's element or class appea
 screenshot. Record `lastResult` per spin while a feature runs, to check invariants such as
 "every Wild Throw Spin had a Wild" or "the ladder reset each spin".
 
-## Feature audit
+## Feature audit## Hidden preview panes freeze animations
+
+A hidden browser pane can stop Web Animations and slow timers, so a spin looks frozen even though the code
+is fine, and real bugs hide behind that. Run headless Chromium (Playwright) for sequence tests: record the
+event log in order, screenshot each beat, and add a soak (autoplay on turbo + each buy + forced max win)
+that checks raw x multiplier = total, balance reconciliation and zero page errors. That soak caught a crash
+(a base-game multiplier boost writing free-spin state) that the hidden pane had disguised as a freeze.
+
+
 
 For every headline mechanic, confirm from the math step order that it changes the outcome
 (see FEATURE_DESIGN_AND_ECONOMICS.md §2). A beautiful animation over a no-op is a shipped bug.

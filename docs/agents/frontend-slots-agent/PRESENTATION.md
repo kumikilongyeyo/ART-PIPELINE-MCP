@@ -271,6 +271,18 @@ many small ones. Sequence that tested well:
 - In a bonus where the multiplier jumps off its normal +step ladder, rebuild the wheel/ladder around
   the old value and roll one position to the new one, rather than computing a ladder index.
 
+## Collect-then-multiply win sequence (tested great with placeholder art)
+
+When wins collect over cascades and a multiplier applies once at the end, this order read clearly:
+1. cascades play; wins accumulate silently (no running banner updates competing with the tumbles),
+2. the collected total appears big in the centre of the reels (glow + scale), holds, travels into the WIN banner,
+3. the multiplier orb **stays in place**, charges, and fires a projectile at the banner,
+4. impact: banner flash, a brief "×N" stamp, the multiplied total counts up with a scale pop,
+5. banner glow + upward coin burst, then every temporary effect clears.
+One banner write per stage and one win-meter write at the end: no double counting. A version where the
+medallion itself flew down into the banner was rejected ("never move downward or follow falling symbols").
+Build the choreography with CSS placeholders and named hooks (classes + events) so art drops in later.
+
 ## Presentation timing
 
 The Jeepney engine's config-driven normal/turbo profiles are the preferred direction. The Showcase hard-coded waits should be refactored when touching those paths.

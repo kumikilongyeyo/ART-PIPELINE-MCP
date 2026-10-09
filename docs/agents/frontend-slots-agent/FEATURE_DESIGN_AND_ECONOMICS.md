@@ -78,6 +78,17 @@ return to 356%. Patterns that stay bounded and still feel huge:
 - Multiplier Wilds pay and burst; they don't trigger further throws (runaway chains).
 Tune in this order: event frequency → multiplier distribution → mechanic rules. Re-run the sim after each step.
 
+### A frequent super-version multiplies everything
+A 60% chance for every winning Wild to upgrade and throw 3-7 multiplier Wilds took the demo to ~4,000%
+(Golden throw every 8 spins), and still ~1,300% after making Wild multipliers add instead of multiply,
+because several sticky Wilds across reels explode the ways count. Keep the user's rule (60%, 3-7) and
+move the levers they didn't set: Wild frequency (Golden ~1 in 25 spins), then paytable scale, then buy
+prices and package sizes. Say which agreed numbers changed (e.g. a 10-spin buy became 4 spins to stay cheap).
+
+### Collect-then-multiply changes the economy
+Switching from "each tumble pays at its multiplier" to "collect, multiply once at the end" means every
+win gets at least the first step (x2 here). Payback nearly doubled; rescale the paytable and re-price buys.
+
 ### A bonus multiplier that starts high and steps small
 Starting at x18 and adding +1 per win reads as nothing (+5%). Measured: median bonus ended at x25.
 Either step proportionally, or feed the multiplier from a visible event (see above).
